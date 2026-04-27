@@ -7,11 +7,10 @@
     <style>
         body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; background: #001220; color: white; overflow-x: hidden; }
 
-        /* 全体背景（深い宇宙・空のイメージ） */
         .app-container {
             min-height: 100vh;
             background: radial-gradient(circle at top, #003366 0%, #001220 100%);
-            padding: 20px;
+            padding: 20px 20px 90px 20px; /* ナビバー分(70px + 余白20px)を確保 */
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
@@ -44,8 +43,8 @@
         .progress-bg { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 15; }
         .progress-bar {
             fill: none; stroke: #00aaff; stroke-width: 15;
-            stroke-linecap: round; stroke-dasharray: 565; /* 2 * PI * 90 */
-            stroke-dashoffset: 565; /* 100%の時0 */
+            stroke-linecap: round; stroke-dasharray: 565;
+            stroke-dashoffset: 565;
             transition: stroke-dashoffset 1.5s ease-out;
         }
         .prob-text {
@@ -70,11 +69,16 @@
         .data-row { margin-bottom: 10px; font-size: 16px; }
         .data-label { font-size: 10px; opacity: 0.6; display: block; text-transform: uppercase; }
 
-        /* カウントダウンフッター */
-        .footer-btn {
-            width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-            padding: 15px; border-radius: 15px; color: white; font-size: 18px; text-align: center;
+        /* --- ボトムナビゲーション --- */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 70px;
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+            display: flex; justify-content: space-around; align-items: center;
+            border-top: 1px solid rgba(0, 0, 0, 0.1); z-index: 9999;
         }
+        .nav-item { text-decoration: none; color: #666; display: flex; flex-direction: column; align-items: center; font-size: 10px; flex: 1; }
+        .nav-item.active { color: #00aaff; font-weight: bold; }
+        .nav-icon { font-size: 20px; margin-bottom: 2px; }
     </style>
 </head>
 <body>
@@ -110,41 +114,44 @@
             <span id="display-task">Loading...</span>
         </div>
     </div>
-
-    <div class="footer-btn">
-        試験まであと <span id="days-left">--</span> 日
-    </div>
 </div>
+
+<nav class="bottom-nav">
+    <a href="home.html" class="nav-item active">
+        <span class="nav-icon">🏠</span><span>ホーム</span>
+    </a>
+    <a href="nittei.html" class="nav-item">
+        <span class="nav-icon">📅</span><span>スケジュール</span>
+    </a>
+    <a href="mock.html" class="nav-item">
+        <span class="nav-icon">🏆</span><span>模擬試験</span>
+    </a>
+    <a href="progress.html" class="nav-item">
+        <span class="nav-icon">💼</span><span>進捗DB</span>
+    </a>
+    <a href="mypage.html" class="nav-item">
+        <span class="nav-icon">👤</span><span>マイページ</span>
+    </a>
+</nav>
 
 <script>
     window.onload = function() {
-        // 1. 起動画面で保存したデータを取得
+        // データの復元
         const savedTime = localStorage.getItem('targetStudyTime') || '0';
         const savedTask = localStorage.getItem('todayKeyTask') || '未設定';
-        
         document.getElementById('display-time').innerText = savedTime;
         document.getElementById('display-task').innerText = savedTask;
 
-        // 2. 合格可能性の変数を反映（デモ用に55%に設定）
-        const passProbability = 55; 
-        updateProbability(passProbability);
-
-        // 3. カウントダウン（例：2026年12月31日）
-        const targetDate = new Date('2026-12-31');
-        const today = new Date();
-        const diff = Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24));
-        document.getElementById('days-left').innerText = diff;
+        // 合格可能性アニメーション（仮で55%）
+        setTimeout(() => updateProbability(55), 500);
     }
 
     function updateProbability(val) {
         const bar = document.getElementById('prob-bar');
         const valText = document.getElementById('prob-val');
-        
-        // サークルの計算
         const offset = 565 - (565 * val / 100);
         bar.style.strokeDashoffset = offset;
         
-        // 数字のカウントアップ演出
         let count = 0;
         const timer = setInterval(() => {
             if(count >= val) clearInterval(timer);
@@ -153,61 +160,5 @@
         }, 20);
     }
 </script>
-<nav class="bottom-nav">
-    <a href="home.html" class="nav-item">
-        <span class="icon">🏠</span>
-        <span class="label">ホーム</span>
-    </a>
-    <a href="nittei.html" class="nav-item">
-        <span class="icon">📅</span>
-        <span class="label">スケジュール</span>
-    </a>
-    <a href="mock.html" class="nav-item">
-        <span class="icon">🏆</span>
-        <span class="label">模擬試験</span>
-    </a>
-    <a href="progress.html" class="nav-item">
-        <span class="icon">💼</span>
-        <span class="label">進捗DB</span>
-    </a>
-    <a href="mypage.html" class="nav-item">
-        <span class="icon">👤</span>
-        <span class="label">マイページ</span>
-    </a>
-</nav>
-
-<style>
-    /* ナビゲーションのスタイル設定（画像に干渉させない） */
-    .bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 70px;
-        background: rgba(255, 255, 255, 0.9); /* すりガラス風の白 */
-        backdrop-filter: blur(10px);
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        border-top: 1px solid rgba(0, 0, 0, 0.1);
-        z-index: 9999; /* 最前面に配置 */
-    }
-
-    .nav-item {
-        text-decoration: none;
-        color: #333;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        font-size: 10px;
-    }
-
-    /* 現在のページのアイコンだけ青くする（変数的な扱い） */
-    .nav-item.active {
-        color: #00aaff;
-    }
-
-    .icon { font-size: 20px; margin-bottom: 2px; }
-</style>
 </body>
 </html>
