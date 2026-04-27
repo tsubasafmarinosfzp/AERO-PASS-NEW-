@@ -10,7 +10,7 @@
         .app-container {
             min-height: 100vh;
             background: radial-gradient(circle at top, #003366 0%, #001220 100%);
-            padding: 20px;
+            padding: 20px 20px 90px 20px; /* ナビバー分の余白 */
             box-sizing: border-box;
         }
 
@@ -19,43 +19,45 @@
         /* 共通パネル：グラスモーフィズム */
         .glass-panel {
             background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 15px;
-            margin-bottom: 15px;
+            border-radius: 20px; padding: 15px; margin-bottom: 15px;
         }
 
-        /* --- カレンダーセクション --- */
-        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        /* カレンダー */
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
         .day-label { font-size: 10px; opacity: 0.6; padding-bottom: 5px; }
         .day {
             padding: 10px 0; border-radius: 8px; font-size: 14px; cursor: pointer;
             transition: 0.2s; position: relative;
         }
-        .day:hover { background: rgba(255,255,255,0.1); }
         .day.selected { background: #00aaff; color: white; font-weight: bold; }
         .day.has-task::after {
             content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
             width: 4px; height: 4px; background: #00aaff; border-radius: 50%;
         }
 
-        /* --- AI Captainセクション --- */
+        /* AI Section */
         .ai-section { display: flex; align-items: flex-start; gap: 15px; }
         .ai-icon { font-size: 30px; }
         .ai-content h3 { margin: 0 0 5px 0; font-size: 14px; color: #00aaff; }
         .ai-text { font-size: 13px; line-height: 1.5; opacity: 0.9; }
 
-        /* --- タスクリストセクション --- */
+        /* Task List */
         .task-header { font-size: 14px; color: #00aaff; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; }
         .task-item { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 15px; }
-        .task-item input[type="checkbox"] {
-            width: 18px; height: 18px; accent-color: #00aaff; cursor: pointer;
-        }
-        .task-item.done span { text-decoration: line-through; opacity: 0.5; }
+        .task-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: #00aaff; }
 
+        /* --- ボトムナビゲーション --- */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 70px;
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+            display: flex; justify-content: space-around; align-items: center;
+            border-top: 1px solid rgba(0, 0, 0, 0.1); z-index: 9999;
+        }
+        .nav-item { text-decoration: none; color: #666; display: flex; flex-direction: column; align-items: center; font-size: 10px; flex: 1; }
+        .nav-item.active { color: #00aaff; font-weight: bold; }
+        .nav-icon { font-size: 20px; margin-bottom: 2px; }
     </style>
 </head>
 <body>
@@ -64,9 +66,7 @@
     <div class="header"><h1>AERO PASS</h1></div>
 
     <div class="glass-panel">
-        <div class="calendar-header">
-            <span id="month-display">2026年 4月</span>
-        </div>
+        <div style="text-align: center; margin-bottom: 10px; font-size: 14px;">2026年 4月</div>
         <div class="calendar-grid">
             <div class="day-label">月</div><div class="day-label">火</div><div class="day-label">水</div>
             <div class="day-label">木</div><div class="day-label">金</div><div class="day-label">土</div><div class="day-label">日</div>
@@ -78,86 +78,74 @@
         <div class="ai-icon">✈️</div>
         <div class="ai-content">
             <h3>AI Captainの提言</h3>
-            <div id="ai-advice" class="ai-text">フライトプランを分析中...</div>
+            <div id="ai-advice" class="ai-text">フライトデータを分析中...</div>
         </div>
     </div>
 
     <div class="glass-panel">
         <div class="task-header">今日のタスクリスト</div>
-        <div id="task-list">
-            </div>
+        <div id="task-list"></div>
     </div>
 </div>
 
+<nav class="bottom-nav">
+    <a href="home.html" class="nav-item">
+        <span class="nav-icon">🏠</span><span>ホーム</span>
+    </a>
+    <a href="nittei.html" class="nav-item active">
+        <span class="nav-icon">📅</span><span>スケジュール</span>
+    </a>
+    <a href="mock.html" class="nav-item">
+        <span class="nav-icon">🏆</span><span>模擬試験</span>
+    </a>
+    <a href="progress.html" class="nav-item">
+        <span class="nav-icon">💼</span><span>進捗DB</span>
+    </a>
+    <a href="mypage.html" class="nav-item">
+        <span class="nav-icon">👤</span><span>マイページ</span>
+    </a>
+</nav>
+
 <script>
-    // --- 変数（Data）の定義 ---
     let selectedDate = 29;
     const tasksData = {
         28: [{text: "過去問演習", done: true}, {text: "単語復習", done: true}],
         29: [{text: "物理：電磁気 20問", done: false}, {text: "TOEIC L&R 模試", done: false}],
         30: [{text: "英作文 添削依頼", done: false}]
     };
-
     const aiAdvices = {
-        28: "昨日は素晴らしいフライトでした。今日もその調子で。",
-        29: "本日は「電磁気」に乱気流の予報。集中力を高めて突破しましょう。",
-        30: "試験まで残りわずか。燃料（休息）の補給も忘れずに。"
+        28: "昨日は素晴らしいフライトでした。",
+        29: "本日は電磁気のエリアに乱気流。集中してください。",
+        30: "試験まであとわずか。最終調整に入りましょう。"
     };
 
-    // --- 初期表示プログラム ---
     window.onload = function() {
         renderCalendar();
         updateDisplay(selectedDate);
     };
 
-    // カレンダーを生成する関数
     function renderCalendar() {
         const grid = document.getElementById('calendar-days');
         grid.innerHTML = '';
-        for (let i = 27; i <= 33; i++) { // デモ用に一部の日付を表示
+        for (let i = 27; i <= 33; i++) {
             const dayNum = i > 30 ? i - 30 : i;
             const dayDiv = document.createElement('div');
             dayDiv.className = 'day' + (dayNum === selectedDate ? ' selected' : '') + (tasksData[dayNum] ? ' has-task' : '');
             dayDiv.innerText = dayNum;
-            dayDiv.onclick = () => {
-                selectedDate = dayNum;
-                renderCalendar(); // 再描画
-                updateDisplay(dayNum);
-            };
+            dayDiv.onclick = () => { selectedDate = dayNum; renderCalendar(); updateDisplay(dayNum); };
             grid.appendChild(dayDiv);
         }
     }
 
-    // 画面全体の内容を更新する関数（変数連動の核心）
     function updateDisplay(date) {
-        // AIアドバイスの更新（Gemini埋め込み箇所）
-        document.getElementById('ai-advice').innerText = aiAdvices[date] || "今日のプランを確認しましょう。";
-
-        // タスクリストの更新
-        const listContainer = document.getElementById('task-list');
-        listContainer.innerHTML = '';
-        const tasks = tasksData[date] || [];
-
-        if (tasks.length === 0) {
-            listContainer.innerHTML = '<div style="opacity:0.5; font-size:12px;">予定はありません。</div>';
-            return;
-        }
-
-        tasks.forEach((task, index) => {
-            const item = document.createElement('div');
-            item.className = 'task-item' + (task.done ? ' done' : '');
-            item.innerHTML = `
-                <input type="checkbox" ${task.done ? 'checked' : ''} onchange="toggleTask(${date}, ${index})">
-                <span>${task.text}</span>
-            `;
-            listContainer.appendChild(item);
-        });
-    }
-
-    // タスクのチェックを切り替える関数
-    function toggleTask(date, index) {
-        tasksData[date][index].done = !tasksData[date][index].done;
-        updateDisplay(date);
+        document.getElementById('ai-advice').innerText = aiAdvices[date] || "プランを確認しましょう。";
+        const list = document.getElementById('task-list');
+        list.innerHTML = (tasksData[date] || []).map((t, i) => `
+            <div class="task-item">
+                <input type="checkbox" ${t.done ? 'checked' : ''} onchange="tasksData[${date}][${i}].done = !tasksData[${date}][${i}].done; updateDisplay(${date});">
+                <span style="${t.done ? 'text-decoration:line-through; opacity:0.5;' : ''}">${t.text}</span>
+            </div>
+        `).join('') || '<div style="opacity:0.5; font-size:12px;">予定なし</div>';
     }
 </script>
 </body>
