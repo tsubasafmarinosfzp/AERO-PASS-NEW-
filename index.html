@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>AERO PASS - Launch</title>
+    <style>
+        body, html { margin: 0; padding: 0; overflow: hidden; background: #000; }
+        #app-container {
+            position: relative;
+            margin: 0 auto;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        /* 入力欄のスタイル（グラスモーフィズム） */
+        .overlay-input {
+            position: absolute;
+            background: rgba(0, 45, 114, 0.6); /* 背景に馴染む紺色 */
+            backdrop-filter: blur(8px);       /* 下のダミー文字をボカす */
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 5px;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    </div>
+
+<script>
+    const imgPath = 'bg.png'; // 翼くんが保存した画像名
+    const container = document.getElementById('app-container');
+
+    const img = new Image();
+    img.src = imgPath;
+
+    img.onload = function() {
+        // 画像のサイズを自動取得！
+        const w = img.naturalWidth;
+        const h = img.naturalHeight;
+        const aspectRatio = w / h;
+
+        // 画面に合わせてコンテナを正確な比率に設定
+        container.style.width = '100vw';
+        container.style.height = (100 / aspectRatio) + 'vw';
+        container.style.backgroundImage = `url(${imgPath})`;
+
+        // 解析した座標に「変数」をネジ止め（%指定）
+        createInput(64, 13, 74, 6.5, "targetTime"); // 目標時間
+        createInput(78, 13, 74, 6.5, "keyTask");    // タスク
+    };
+
+    function createInput(top, left, width, height, id) {
+        const input = document.createElement('input');
+        input.id = id;
+        input.className = 'overlay-input';
+        input.style.top = top + '%';
+        input.style.left = left + '%';
+        input.style.width = width + '%';
+        input.style.height = height + '%';
+        container.appendChild(input);
+    }
+</script>
+</body>
+</html>
