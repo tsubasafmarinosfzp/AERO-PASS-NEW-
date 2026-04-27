@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AERO PASS - MyPage</title>
+    <style>
+        body, html { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: #001220; color: white; }
+        .app-container { min-height: 100vh; background: radial-gradient(circle at top, #003366 0%, #001220 100%); padding: 20px; box-sizing: border-box; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h1 { font-style: italic; letter-spacing: 3px; font-size: 24px; margin: 0; }
+        .header p { font-size: 14px; opacity: 0.7; }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+        }
+
+        /* プロフィール部分 */
+        .profile-row { display: flex; align-items: center; gap: 20px; }
+        .avatar { width: 70px; height: 70px; border-radius: 50%; border: 2px solid #00aaff; background: #eee; }
+        .user-info h2 { margin: 0; font-size: 18px; }
+        .user-info p { margin: 5px 0 0 0; font-size: 14px; color: #00aaff; }
+
+        /* 教材管理リスト */
+        .section-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 14px; }
+        .material-item { margin-bottom: 15px; }
+        .material-info { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; }
+        .progress-bg { height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #00aaff, #55ccff); transition: width 0.5s; }
+
+        /* データ操作ボタン */
+        .btn-action {
+            width: 100%; padding: 15px; border-radius: 12px; border: none; margin-bottom: 10px;
+            background: white; color: #003366; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header"><h1>AERO PASS</h1><p>設定画面</p></div>
+
+    <div class="glass-panel">
+        <p style="font-size: 12px; opacity: 0.6; margin-top: 0;">プロフィール管理 (Maintenance Hangar)</p>
+        <div class="profile-row">
+            <div class="avatar">
+                <img src="https://via.placeholder.com/70" style="width:100%; border-radius:50%;"> </div>
+            <div class="user-info">
+                <h2 id="user-name">ユーザー名：翼くん</h2>
+                <p id="target-score">目標点：285/350点</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="glass-panel">
+        <div class="section-title">
+            <span>参考書・教材管理</span>
+            <span style="letter-spacing: 5px;">＋ － ⇅</span>
+        </div>
+        <div id="material-list">
+            </div>
+    </div>
+
+    <div class="glass-panel">
+        <p style="font-size: 12px; opacity: 0.6; margin-top: 0;">データ・フライトデータ管理</p>
+        <button class="btn-action" onclick="alert('データをエクスポートしました')">✈️ Export (データ出力)</button>
+        <button class="btn-action" onclick="alert('データを読み込みました')">📤 Import (データ読込)</button>
+    </div>
+</div>
+
+<script>
+    // --- 変数データの定義 ---
+    const materials = [
+        { title: "青チャート1A", prog: 35 },
+        { title: "漆原の物理", prog: 20 },
+        { title: "英語過去問集", prog: 50 },
+        { title: "総合時事・気象", prog: 10 },
+        { title: "ニュース", prog: 5 }
+    ];
+
+    window.onload = function() {
+        const list = document.getElementById('material-list');
+        list.innerHTML = materials.map(m => `
+            <div class="material-item">
+                <div class="material-info">
+                    <span>${m.title}</span>
+                    <span>${m.prog}%</span>
+                </div>
+                <div class="progress-bg">
+                    <div class="progress-fill" style="width: ${m.prog}%"></div>
+                </div>
+            </div>
+        `).join('');
+    };
+</script>
+</body>
+</html>
