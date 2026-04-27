@@ -7,80 +7,110 @@
     <style>
         body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; font-family: sans-serif; }
 
-        /* 画像と同じ比率で維持されるコンテナ */
+        /* メインコンテナ：ナビバーの高さ分（70px）だけ下にマージンを確保 */
         #app-container {
             position: relative;
             margin: 0 auto;
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
+            height: calc(100vh - 70px); 
         }
 
-        /* 変数入力欄のスタイル（下のダミー文字を隠す「馴染ませ」設定） */
+        /* 入力欄（目隠し＆馴染ませ設定） */
         .overlay-input {
             position: absolute;
-            background: rgba(0, 45, 114, 0.5); /* 画像の紺色に近い半透明 */
-            backdrop-filter: blur(10px);       /* 下の「例：6時間」をボカして隠す */
+            background: rgba(0, 45, 114, 0.5);
+            backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 12px;
             color: white;
             padding: 0 15px;
-            font-size: 1.2rem;
+            font-size: 1rem;
             box-sizing: border-box;
             outline: none;
         }
 
-        /* Take Off! ボタンの反応エリア */
         .btn-take-off {
             position: absolute;
-            background: rgba(255, 255, 255, 0); /* 完全に透明にして下のボタン画像を活用 */
+            background: rgba(255, 255, 255, 0);
             border: none;
             cursor: pointer;
             border-radius: 30px;
         }
-        
-        .btn-take-off:active {
-            background: rgba(255, 255, 255, 0.1); /* 押した時だけわずかに光る演出 */
+
+        /* --- ボトムナビゲーション（固定） --- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            z-index: 9999;
         }
+        .nav-item {
+            text-decoration: none;
+            color: #666;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 10px;
+            flex: 1;
+        }
+        .nav-item.active { color: #00aaff; font-weight: bold; }
+        .nav-icon { font-size: 20px; margin-bottom: 2px; }
     </style>
 </head>
 <body>
 
 <div id="app-container"></div>
 
+<nav class="bottom-nav">
+    <a href="home.html" class="nav-item">
+        <span class="nav-icon">🏠</span><span>ホーム</span>
+    </a>
+    <a href="nittei.html" class="nav-item">
+        <span class="nav-icon">📅</span><span>スケジュール</span>
+    </a>
+    <a href="mock.html" class="nav-item">
+        <span class="nav-icon">🏆</span><span>模擬試験</span>
+    </a>
+    <a href="progress.html" class="nav-item">
+        <span class="nav-icon">💼</span><span>進捗DB</span>
+    </a>
+    <a href="mypage.html" class="nav-item">
+        <span class="nav-icon">👤</span><span>マイページ</span>
+    </a>
+</nav>
+
 <script>
-    // 翼くん：ここに使いたい画像ファイル名を入れてください
     const imageFileName = 'launch.png.jfif'; 
     const container = document.getElementById('app-container');
-
     const img = new Image();
     img.src = imageFileName;
 
     img.onload = function() {
-        // 1. 画像からアスペクト比を自動取得
         const aspectRatio = img.naturalWidth / img.naturalHeight;
-        
-        // 2. 画面に合わせてコンテナを正確に構築
         container.style.width = '100vw';
-        container.style.height = (100 / aspectRatio) + 'vw';
         container.style.backgroundImage = `url(${imageFileName})`;
 
-        // 3. 解析した座標に基づいて「変数」と「ボタン」を設置
-        // createInput(top%, left%, width%, height%, 変数名)
+        // 座標指定（画像に合わせた調整済み）
         createInput(63.5, 12.5, 75, 6.8, "targetStudyTime"); 
         createInput(77.5, 12.5, 75, 6.8, "todayKeyTask");
-
-        // createButton(top%, left%, width%, height%, 実行する関数)
         createButton(87.5, 18, 64, 7.5, handleTakeOff);
     };
 
-    // 入力欄（変数）を生成するプログラム
-    function createInput(top, left, width, height, variableId) {
+    function createInput(top, left, width, height, id) {
         const input = document.createElement('input');
-        input.id = variableId;
+        input.id = id;
         input.className = 'overlay-input';
-        input.placeholder = "入力してください";
         input.style.top = top + '%';
         input.style.left = left + '%';
         input.style.width = width + '%';
@@ -88,7 +118,6 @@
         container.appendChild(input);
     }
 
-    // ボタンを生成するプログラム
     function createButton(top, left, width, height, action) {
         const btn = document.createElement('button');
         btn.className = 'btn-take-off';
@@ -100,80 +129,15 @@
         container.appendChild(btn);
     }
 
-    // 「Take Off!」ボタンが押された時の処理
     function handleTakeOff() {
         const time = document.getElementById('targetStudyTime').value;
         const task = document.getElementById('todayKeyTask').value;
-
-        if(!time || !task) {
-            alert("キャプテン、フライトプランを入力してください。");
-            return;
-        }
-
-        // 変数をブラウザに一時保存（次のページへ持っていく準備）
+        if(!time || !task) return alert("フライトプランを入力してください。");
+        
         localStorage.setItem('targetStudyTime', time);
         localStorage.setItem('todayKeyTask', task);
-
-        alert(`テイクオフ！ 目標：${time}時間、タスク：${task} を保存しました。`);
-        // ここで次のページへ遷移
-        // window.location.href = 'main.html'; 
+        window.location.href = 'home.html'; 
     }
 </script>
-    <nav class="bottom-nav">
-    <a href="home.html" class="nav-item">
-        <span class="icon">🏠</span>
-        <span class="label">ホーム</span>
-    </a>
-    <a href="nittei.html" class="nav-item">
-        <span class="icon">📅</span>
-        <span class="label">スケジュール</span>
-    </a>
-    <a href="mock.html" class="nav-item">
-        <span class="icon">🏆</span>
-        <span class="label">模擬試験</span>
-    </a>
-    <a href="progress.html" class="nav-item">
-        <span class="icon">💼</span>
-        <span class="label">進捗DB</span>
-    </a>
-    <a href="mypage.html" class="nav-item">
-        <span class="icon">👤</span>
-        <span class="label">マイページ</span>
-    </a>
-</nav>
-
-<style>
-    /* ナビゲーションのスタイル設定（画像に干渉させない） */
-    .bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 70px;
-        background: rgba(255, 255, 255, 0.9); /* すりガラス風の白 */
-        backdrop-filter: blur(10px);
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        border-top: 1px solid rgba(0, 0, 0, 0.1);
-        z-index: 9999; /* 最前面に配置 */
-    }
-
-    .nav-item {
-        text-decoration: none;
-        color: #333;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        font-size: 10px;
-    }
-
-    /* 現在のページのアイコンだけ青くする（変数的な扱い） */
-    .nav-item.active {
-        color: #00aaff;
-    }
-
-    .icon { font-size: 20px; margin-bottom: 2px; }
-</style>
 </body>
 </html>
