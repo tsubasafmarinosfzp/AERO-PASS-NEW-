@@ -2,9 +2,12 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AERO PASS - Launch</title>
     <style>
-        body, html { margin: 0; padding: 0; overflow: hidden; background: #000; }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; font-family: sans-serif; }
+
+        /* 画像と同じ比率で維持されるコンテナ */
         #app-container {
             position: relative;
             margin: 0 auto;
@@ -12,56 +15,108 @@
             background-repeat: no-repeat;
             background-position: center;
         }
-        /* 入力欄のスタイル（グラスモーフィズム） */
+
+        /* 変数入力欄のスタイル（下のダミー文字を隠す「馴染ませ」設定） */
         .overlay-input {
             position: absolute;
-            background: rgba(0, 45, 114, 0.6); /* 背景に馴染む紺色 */
-            backdrop-filter: blur(8px);       /* 下のダミー文字をボカす */
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(0, 45, 114, 0.5); /* 画像の紺色に近い半透明 */
+            backdrop-filter: blur(10px);       /* 下の「例：6時間」をボカして隠す */
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
             color: white;
-            padding: 5px;
-            border-radius: 5px;
+            padding: 0 15px;
+            font-size: 1.2rem;
             box-sizing: border-box;
+            outline: none;
+        }
+
+        /* Take Off! ボタンの反応エリア */
+        .btn-take-off {
+            position: absolute;
+            background: rgba(255, 255, 255, 0); /* 完全に透明にして下のボタン画像を活用 */
+            border: none;
+            cursor: pointer;
+            border-radius: 30px;
+        }
+        
+        .btn-take-off:active {
+            background: rgba(255, 255, 255, 0.1); /* 押した時だけわずかに光る演出 */
         }
     </style>
 </head>
 <body>
 
-<div id="app-container">
-    </div>
+<div id="app-container"></div>
 
 <script>
-    const imgPath = 'bg.png'; // 翼くんが保存した画像名
+    // 翼くん：ここに使いたい画像ファイル名を入れてください
+    const imageFileName = 'launch.png.jfif'; 
     const container = document.getElementById('app-container');
 
     const img = new Image();
-    img.src = imgPath;
+    img.src = imageFileName;
 
     img.onload = function() {
-        // 画像のサイズを自動取得！
-        const w = img.naturalWidth;
-        const h = img.naturalHeight;
-        const aspectRatio = w / h;
-
-        // 画面に合わせてコンテナを正確な比率に設定
+        // 1. 画像からアスペクト比を自動取得
+        const aspectRatio = img.naturalWidth / img.naturalHeight;
+        
+        // 2. 画面に合わせてコンテナを正確に構築
         container.style.width = '100vw';
         container.style.height = (100 / aspectRatio) + 'vw';
-        container.style.backgroundImage = `url(${imgPath})`;
+        container.style.backgroundImage = `url(${imageFileName})`;
 
-        // 解析した座標に「変数」をネジ止め（%指定）
-        createInput(64, 13, 74, 6.5, "targetTime"); // 目標時間
-        createInput(78, 13, 74, 6.5, "keyTask");    // タスク
+        // 3. 解析した座標に基づいて「変数」と「ボタン」を設置
+        // createInput(top%, left%, width%, height%, 変数名)
+        createInput(63.5, 12.5, 75, 6.8, "targetStudyTime"); 
+        createInput(77.5, 12.5, 75, 6.8, "todayKeyTask");
+
+        // createButton(top%, left%, width%, height%, 実行する関数)
+        createButton(87.5, 18, 64, 7.5, handleTakeOff);
     };
 
-    function createInput(top, left, width, height, id) {
+    // 入力欄（変数）を生成するプログラム
+    function createInput(top, left, width, height, variableId) {
         const input = document.createElement('input');
-        input.id = id;
+        input.id = variableId;
         input.className = 'overlay-input';
+        input.placeholder = "入力してください";
         input.style.top = top + '%';
         input.style.left = left + '%';
         input.style.width = width + '%';
         input.style.height = height + '%';
         container.appendChild(input);
+    }
+
+    // ボタンを生成するプログラム
+    function createButton(top, left, width, height, action) {
+        const btn = document.createElement('button');
+        btn.className = 'btn-take-off';
+        btn.style.top = top + '%';
+        btn.style.left = left + '%';
+        btn.style.width = width + '%';
+        btn.style.height = height + '%';
+        btn.onclick = action;
+        container.appendChild(btn);
+    }
+
+    // 「Take Off!」ボタンが押された時の処理
+    function handleTakeOff() {
+        const time = document.getElementById('targetStudyTime').value;
+        const task = document.getElementById('todayKeyTask').value;
+
+        if(!time || !task) {
+            alert("キャプテン、フライトプランを入力してください。");
+            return;
+        }
+
+        // 変数をブラウザに一時保存（次のページへ持っていく準備）
+        localStorage.setItem('targetStudyTime', time);
+        localStorage.setItem('todayKeyTask', task);
+
+        alert(`テイクオフ！ 目標：${time}時間、タスク：${task} を保存しました。`);
+        // ここで次のページへ遷移
+        // window.location.href = 'main.html'; 
     }
 </script>
 </body>
