@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AERO PASS - Home</title>
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; background: #001220; color: white; overflow-x: hidden; }
+
+        /* 全体背景（深い宇宙・空のイメージ） */
+        .app-container {
+            min-height: 100vh;
+            background: radial-gradient(circle at top, #003366 0%, #001220 100%);
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header h1 { font-style: italic; letter-spacing: 3px; font-size: 28px; margin-bottom: 30px; }
+
+        /* 3連計器（固定デザイン） */
+        .gauges-row { display: flex; gap: 15px; margin-bottom: 30px; }
+        .gauge-fixed {
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.3);
+            background: rgba(0,0,0,0.4);
+            position: relative;
+        }
+        .gauge-fixed::after {
+            content: ''; position: absolute; top: 10%; left: 50%; width: 2px; height: 40%;
+            background: #ff3333; transform-origin: bottom; transform: translateX(-50%) rotate(45deg);
+        }
+
+        /* 中央の合格可能性（メイン変数） */
+        .main-display {
+            width: 220px; height: 220px;
+            position: relative;
+            margin-bottom: 40px;
+        }
+        .progress-svg { transform: rotate(-90deg); }
+        .progress-bg { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 15; }
+        .progress-bar {
+            fill: none; stroke: #00aaff; stroke-width: 15;
+            stroke-linecap: round; stroke-dasharray: 565; /* 2 * PI * 90 */
+            stroke-dashoffset: 565; /* 100%の時0 */
+            transition: stroke-dashoffset 1.5s ease-out;
+        }
+        .prob-text {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        .prob-number { font-size: 48px; font-weight: bold; display: block; }
+        .prob-label { font-size: 12px; opacity: 0.7; }
+
+        /* 今日の任務パネル（閲覧のみ） */
+        .info-panel {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 20px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+        }
+        .info-panel h3 { margin: 0 0 15px 0; font-size: 14px; color: #00aaff; }
+        .data-row { margin-bottom: 10px; font-size: 16px; }
+        .data-label { font-size: 10px; opacity: 0.6; display: block; text-transform: uppercase; }
+
+        /* カウントダウンフッター */
+        .footer-btn {
+            width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+            padding: 15px; border-radius: 15px; color: white; font-size: 18px; text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header"><h1>AERO PASS</h1></div>
+
+    <div class="gauges-row">
+        <div class="gauge-fixed"></div>
+        <div class="gauge-fixed" style="width: 80px; height: 80px;"></div>
+        <div class="gauge-fixed"></div>
+    </div>
+
+    <div class="main-display">
+        <svg class="progress-svg" width="220" height="220">
+            <circle class="progress-bg" cx="110" cy="110" r="90"></circle>
+            <circle id="prob-bar" class="progress-bar" cx="110" cy="110" r="90"></circle>
+        </svg>
+        <div class="prob-text">
+            <span id="prob-val" class="prob-number">0%</span>
+            <span class="prob-label">合格可能性</span>
+        </div>
+    </div>
+
+    <div class="info-panel">
+        <h3>TODAY'S MISSION</h3>
+        <div class="data-row">
+            <span class="data-label">Target Study Time</span>
+            <span id="display-time">--</span> hours
+        </div>
+        <div class="data-row">
+            <span class="data-label">Key Task</span>
+            <span id="display-task">Loading...</span>
+        </div>
+    </div>
+
+    <div class="footer-btn">
+        試験まであと <span id="days-left">--</span> 日
+    </div>
+</div>
+
+<script>
+    window.onload = function() {
+        // 1. 起動画面で保存したデータを取得
+        const savedTime = localStorage.getItem('targetStudyTime') || '0';
+        const savedTask = localStorage.getItem('todayKeyTask') || '未設定';
+        
+        document.getElementById('display-time').innerText = savedTime;
+        document.getElementById('display-task').innerText = savedTask;
+
+        // 2. 合格可能性の変数を反映（デモ用に55%に設定）
+        const passProbability = 55; 
+        updateProbability(passProbability);
+
+        // 3. カウントダウン（例：2026年12月31日）
+        const targetDate = new Date('2026-12-31');
+        const today = new Date();
+        const diff = Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24));
+        document.getElementById('days-left').innerText = diff;
+    }
+
+    function updateProbability(val) {
+        const bar = document.getElementById('prob-bar');
+        const valText = document.getElementById('prob-val');
+        
+        // サークルの計算
+        const offset = 565 - (565 * val / 100);
+        bar.style.strokeDashoffset = offset;
+        
+        // 数字のカウントアップ演出
+        let count = 0;
+        const timer = setInterval(() => {
+            if(count >= val) clearInterval(timer);
+            valText.innerText = count + '%';
+            count++;
+        }, 20);
+    }
+</script>
+
+</body>
+</html>
