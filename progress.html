@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AERO PASS - Progress</title>
+    <title>AERO PASS - Progress DB</title>
     <style>
         body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; background: #001220; color: white; overflow-x: hidden; }
 
         .app-container {
             min-height: 100vh;
             background: radial-gradient(circle at top, #003366 0%, #001220 100%);
-            padding: 20px;
+            padding: 20px 20px 90px 20px; /* ナビバー分の余白 */
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
@@ -18,64 +18,57 @@
 
         .header h1 { font-style: italic; letter-spacing: 3px; font-size: 22px; text-align: center; margin-bottom: 20px; }
 
-        /* --- 科目別プログレス --- */
+        /* 科目別プログレス */
         .glass-panel {
             background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 20px;
+            border-radius: 15px; padding: 15px; margin-bottom: 20px;
         }
-        .subject-row { display: flex; align-items: center; margin-bottom: 10px; font-size: 14px; }
-        .subject-name { width: 50px; }
+        .subject-row { display: flex; align-items: center; margin-bottom: 12px; font-size: 14px; }
+        .subject-name { width: 60px; }
         .bar-container { flex-grow: 1; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin: 0 10px; overflow: hidden; }
         .bar-fill { height: 100%; background: linear-gradient(90deg, #00aaff, #005c99); transition: width 1s ease-out; }
 
-        /* --- 滑走路セクション --- */
+        /* 滑走路エリア */
         .runway-area {
-            height: 120px;
+            height: 100px;
             background: rgba(255,255,255,0.05);
-            border-top: 2px dashed rgba(255,255,255,0.3);
-            border-bottom: 2px dashed rgba(255,255,255,0.3);
-            position: relative;
-            margin-bottom: 20px;
-            overflow: hidden;
+            border-top: 2px dashed rgba(255,255,255,0.2);
+            border-bottom: 2px dashed rgba(255,255,255,0.2);
+            position: relative; margin-bottom: 30px;
         }
-        .runway-line { position: absolute; top: 50%; width: 100%; height: 2px; border-top: 2px dashed white; opacity: 0.3; }
+        .runway-line { position: absolute; top: 50%; width: 100%; height: 2px; border-top: 2px dashed rgba(255,255,255,0.3); }
         .airplane {
-            position: absolute; top: 40%; left: 0%; font-size: 30px;
-            transition: left 1s ease-in-out; transform: translateY(-50%);
+            position: absolute; top: 35%; left: 0%; font-size: 28px;
+            transition: left 1.5s ease-in-out; transform: translateY(-50%);
         }
 
-        /* --- 動的本棚セクション --- */
-        .bookshelf-container {
-            margin-top: auto;
-            background: #3e2723; /* 木目調の色 */
-            border-top: 10px solid #5d4037;
-            padding: 10px 5px 0 5px;
-            display: flex;
-            align-items: flex-end;
-            gap: 4px;
-            min-height: 120px;
-            border-radius: 5px 5px 0 0;
+        /* 動的本棚 */
+        .shelf-label { font-size: 12px; text-align: center; opacity: 0.7; margin-bottom: 5px; }
+        .bookshelf {
+            margin-top: auto; background: #3e2723; border-top: 8px solid #5d4037;
+            padding: 10px 5px 0 5px; display: flex; align-items: flex-end; gap: 4px;
+            min-height: 100px; border-radius: 5px 5px 0 0;
         }
         .book {
-            width: 25px;
-            border-radius: 3px 3px 0 0;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            writing-mode: vertical-rl;
-            font-size: 10px;
-            color: rgba(255,255,255,0.8);
-            transition: transform 0.2s, height 0.3s;
-            box-shadow: inset -2px 0 5px rgba(0,0,0,0.3);
+            width: 24px; border-radius: 3px 3px 0 0; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            writing-mode: vertical-rl; font-size: 10px; color: rgba(255,255,255,0.9);
+            transition: transform 0.2s, height 0.3s; box-shadow: inset -2px 0 5px rgba(0,0,0,0.3);
         }
-        .book:hover { transform: translateY(-10px); }
+        .book:hover { transform: translateY(-8px); }
 
+        /* --- ボトムナビゲーション --- */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 70px;
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+            display: flex; justify-content: space-around; align-items: center;
+            border-top: 1px solid rgba(0, 0, 0, 0.1); z-index: 9999;
+        }
+        .nav-item { text-decoration: none; color: #666; display: flex; flex-direction: column; align-items: center; font-size: 10px; flex: 1; }
+        .nav-item.active { color: #00aaff; font-weight: bold; }
+        .nav-icon { font-size: 20px; margin-bottom: 2px; }
     </style>
 </head>
 <body>
@@ -83,69 +76,75 @@
 <div class="app-container">
     <div class="header"><h1>進捗管理</h1></div>
 
-    <div class="glass-panel" id="subject-list">
-        </div>
+    <div class="glass-panel" id="subject-list"></div>
 
     <div class="runway-area">
         <div class="runway-line"></div>
         <div id="airplane" class="airplane">✈️</div>
     </div>
 
-    <p style="font-size: 12px; text-align: center; opacity: 0.7;">本棚（登録した参考書）</p>
-    <div id="bookshelf" class="bookshelf-container">
-        </div>
+    <div class="shelf-label">Library: 登録済みの教材</div>
+    <div id="bookshelf" class="bookshelf"></div>
 </div>
 
+<nav class="bottom-nav">
+    <a href="home.html" class="nav-item">
+        <span class="nav-icon">🏠</span><span>ホーム</span>
+    </a>
+    <a href="nittei.html" class="nav-item">
+        <span class="nav-icon">📅</span><span>スケジュール</span>
+    </a>
+    <a href="mock.html" class="nav-item">
+        <span class="nav-icon">🏆</span><span>模擬試験</span>
+    </a>
+    <a href="progress.html" class="nav-item active">
+        <span class="nav-icon">💼</span><span>進捗DB</span>
+    </a>
+    <a href="mypage.html" class="nav-item">
+        <span class="nav-icon">👤</span><span>マイページ</span>
+    </a>
+</nav>
+
 <script>
-    // --- 変数データの定義 ---
     const subjectProgressList = [
-        { name: "数学", val: 80 },
-        { name: "物理", val: 60 },
-        { name: "英語", val: 45 }
+        { name: "数学", val: 80 }, { name: "物理", val: 60 }, { name: "英語", val: 45 }
     ];
 
     const registeredBooks = [
-        { id: 1, title: "青チャート数学I+A", color: "#1e88e5", height: 90 },
-        { id: 2, title: "物理のエッセンス", color: "#e53935", height: 80 },
-        { id: 3, title: "ターゲット1900", color: "#fdd835", height: 70 },
-        { id: 4, title: "Next Stage 英語", color: "#43a047", height: 85 }
+        { id: 1, title: "青チャート1A", color: "#1e88e5", h: 80 },
+        { id: 2, title: "漆原の物理", color: "#e53935", h: 70 },
+        { id: 3, title: "ターゲット", color: "#fdd835", h: 60 },
+        { id: 4, title: "Next Stage", color: "#43a047", h: 75 },
+        { id: 5, title: "過去問演習", color: "#7b1fa2", h: 85 }
     ];
 
     window.onload = function() {
         renderProgress();
         renderBooks();
-        updateRunway();
+        setTimeout(updateRunway, 500);
     };
 
     function renderProgress() {
-        const container = document.getElementById('subject-list');
-        container.innerHTML = subjectProgressList.map(s => `
+        document.getElementById('subject-list').innerHTML = subjectProgressList.map(s => `
             <div class="subject-row">
                 <span class="subject-name">${s.name}</span>
                 <div class="bar-container"><div class="bar-fill" style="width: ${s.val}%"></div></div>
-                <span style="width: 30px;">${s.val}%</span>
+                <span style="width: 35px; text-align:right;">${s.val}%</span>
             </div>
         `).join('');
     }
 
     function renderBooks() {
-        const shelf = document.getElementById('bookshelf');
-        shelf.innerHTML = registeredBooks.map(b => `
-            <div class="book" style="background-color: ${b.color}; height: ${b.height}px;" onclick="showBookDetail(${b.id})">
+        document.getElementById('bookshelf').innerHTML = registeredBooks.map(b => `
+            <div class="book" style="background-color: ${b.color}; height: ${b.h}px;" onclick="alert('${b.title}の詳細を表示します')">
                 ${b.title}
             </div>
         `).join('');
     }
 
     function updateRunway() {
-        // 平均進捗を滑走路の位置に反映
         const avg = subjectProgressList.reduce((acc, cur) => acc + cur.val, 0) / subjectProgressList.length;
-        document.getElementById('airplane').style.left = avg + '%';
-    }
-
-    function showBookDetail(id) {
-        const book = registeredBooks.find(b => b.id === id);
-        alert(`「${book.title}」の詳細画面（理解度グラフなど）へワープします！✈️`);
+        document.getElementById('airplane').style.left = `calc(${avg}% - 30px)`;
     }
 </script>
 </body>
