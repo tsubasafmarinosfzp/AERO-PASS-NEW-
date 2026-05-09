@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AERO PASS - Launch</title>
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; font-family: 'Helvetica Neue', Arial, sans-serif; }
+        #app-container {
+            position: relative; width: 100vw; height: 100vh;
+            background-image: url('launch.png.jfif'); /* 翼くんの画像 */
+            background-size: cover; background-position: center;
+        }
+        .glass-panel {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 85%; padding: 30px 20px; background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); /* 高級感の核 */
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; text-align: center;
+        }
+        .input-box {
+            width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(0, 127, 255, 0.4);
+            border-radius: 8px; color: white; padding: 15px; margin-bottom: 20px; font-size: 16px; box-sizing: border-box;
+        }
+        .btn-take-off {
+            width: 100%; background: linear-gradient(90deg, #005c99, #007FFF);
+            color: white; border: none; padding: 18px; border-radius: 35px; font-weight: bold; cursor: pointer;
+        }
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 75px;
+            background: #f8f8f8; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #dcdcdc;
+        }
+        .nav-item { text-decoration: none; color: #888; display: flex; flex-direction: column; align-items: center; font-size: 10px; }
+    </style>
+</head>
+<body>
+<div id="app-container">
+    <div class="glass-panel">
+        <h2 style="color: #00aaff; font-style: italic; letter-spacing: 3px;">AERO PASS</h2>
+        <input type="number" id="targetStudyTime" class="input-box" placeholder="今日の目標時間 (h)">
+        <input type="text" id="todayKeyTask" class="input-box" placeholder="最優先タスク">
+        <button class="btn-take-off" onclick="handleTakeOff()">TAKE OFF</button>
+    </div>
+</div>
+<nav class="bottom-nav">
+    <a href="home.html" class="nav-item"><span>●</span><span>ホーム</span></a>
+    <a href="nittei.html" class="nav-item"><span>●</span><span>スケジュール</span></a>
+    <a href="mock.html" class="nav-item"><span>●</span><span>模擬試験</span></a>
+    <a href="progress.html" class="nav-item"><span>●</span><span>進捗DB</span></a>
+    <a href="mypage.html" class="nav-item"><span>●</span><span>マイページ</span></a>
+</nav>
+<script>
+    function handleTakeOff() {
+        const time = document.getElementById('targetStudyTime').value;
+        const task = document.getElementById('todayKeyTask').value;
+        if(time && task) {
+            localStorage.setItem('targetStudyTime', time);
+            localStorage.setItem('todayKeyTask', task);
+            window.location.href = 'home.html';
+        }
+    }
+</script>
+</body>
+</html>
