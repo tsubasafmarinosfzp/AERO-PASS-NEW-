@@ -5,106 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AERO PASS - Launch</title>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; font-family: sans-serif; }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; font-family: 'Helvetica Neue', Arial, sans-serif; }
 
-        /* メインコンテナ：ナビバーの高さ分（70px）だけ下にマージンを確保 */
+        /* 画像をキャンバスにする：歪ませず、全画面をカバー */
         #app-container {
             position: relative;
-            margin: 0 auto;
+            width: 100vw;
+            height: calc(100vh - 70px); 
+            background-image: url('launch.png.jfif');
             background-size: contain;
             background-repeat: no-repeat;
-            background-position: center;
-            height: calc(100vh - 70px); 
+            background-position: center top;
         }
 
-        /* 入力欄（目隠し＆馴染ませ設定） */
+        /* 入力欄：背景に馴染むよう、最低限の枠線とぼかしのみ */
         .overlay-input {
             position: absolute;
-            background: rgba(0, 45, 114, 0.5);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
             color: white;
-            padding: 0 15px;
-            font-size: 1rem;
-            box-sizing: border-box;
+            padding: 0 10px;
+            font-size: 16px;
             outline: none;
         }
 
+        /* 透明な離陸ボタン（画像上のボタン位置に重ねる） */
         .btn-take-off {
             position: absolute;
-            background: rgba(255, 255, 255, 0);
+            background: transparent;
             border: none;
             cursor: pointer;
-            border-radius: 30px;
         }
 
-        /* --- ボトムナビゲーション（固定） --- */
+        /* ナビゲーション：翼くんが送ってくれた「白背景の薄型ナビ」を再現 */
         .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 70px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
-            z-index: 9999;
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 70px;
+            background: #f8f8f8; /* 画像に近い非常に薄いグレー */
+            display: flex; justify-content: space-around; align-items: center;
+            border-top: 1px solid #dcdcdc; z-index: 9999;
         }
         .nav-item {
-            text-decoration: none;
-            color: #666;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 10px;
-            flex: 1;
+            text-decoration: none; color: #666; display: flex;
+            flex-direction: column; align-items: center; font-size: 10px; flex: 1;
         }
-        .nav-item.active { color: #00aaff; font-weight: bold; }
-        .nav-icon { font-size: 20px; margin-bottom: 2px; }
+        .nav-item.active { color: #00aaff; } /* アクティブな色 */
+        
+        /* アイコンの代わりに文字やシンプルな図形を配置（作り物感を防ぐ） */
+        .nav-icon { font-size: 18px; margin-bottom: 2px; }
     </style>
 </head>
 <body>
 
-<div id="app-container"></div>
+<div id="app-container">
+    </div>
 
 <nav class="bottom-nav">
     <a href="home.html" class="nav-item">
-        <span class="nav-icon">🏠</span><span>ホーム</span>
+        <span class="nav-icon">●</span><span>ホーム</span>
     </a>
     <a href="nittei.html" class="nav-item">
-        <span class="nav-icon">📅</span><span>スケジュール</span>
+        <span class="nav-icon">●</span><span>スケジュール</span>
     </a>
     <a href="mock.html" class="nav-item">
-        <span class="nav-icon">🏆</span><span>模擬試験</span>
+        <span class="nav-icon">●</span><span>模擬試験</span>
     </a>
     <a href="progress.html" class="nav-item">
-        <span class="nav-icon">💼</span><span>進捗DB</span>
+        <span class="nav-icon">●</span><span>進捗DB</span>
     </a>
     <a href="mypage.html" class="nav-item">
-        <span class="nav-icon">👤</span><span>マイページ</span>
+        <span class="nav-icon">●</span><span>マイページ</span>
     </a>
 </nav>
 
 <script>
-    const imageFileName = 'launch.png.jfif'; 
     const container = document.getElementById('app-container');
-    const img = new Image();
-    img.src = imageFileName;
-
-    img.onload = function() {
-        const aspectRatio = img.naturalWidth / img.naturalHeight;
-        container.style.width = '100vw';
-        container.style.backgroundImage = `url(${imageFileName})`;
-
-        // 座標指定（画像に合わせた調整済み）
-        createInput(63.5, 12.5, 75, 6.8, "targetStudyTime"); 
-        createInput(77.5, 12.5, 75, 6.8, "todayKeyTask");
-        createButton(87.5, 18, 64, 7.5, handleTakeOff);
+    
+    window.onload = function() {
+        // 画像上の正確な位置に「機能」を重ねる
+        createInput(64, 15, 70, 5, "targetStudyTime"); 
+        createInput(78, 15, 70, 5, "todayKeyTask");
+        createButton(88, 20, 60, 6, handleTakeOff);
     };
 
     function createInput(top, left, width, height, id) {
@@ -132,11 +114,11 @@
     function handleTakeOff() {
         const time = document.getElementById('targetStudyTime').value;
         const task = document.getElementById('todayKeyTask').value;
-        if(!time || !task) return alert("フライトプランを入力してください。");
-        
-        localStorage.setItem('targetStudyTime', time);
-        localStorage.setItem('todayKeyTask', task);
-        window.location.href = 'home.html'; 
+        if(time && task) {
+            localStorage.setItem('targetStudyTime', time);
+            localStorage.setItem('todayKeyTask', task);
+            window.location.href = 'home.html';
+        }
     }
 </script>
 </body>
