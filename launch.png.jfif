@@ -8,7 +8,7 @@
         body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; font-family: 'Helvetica Neue', Arial, sans-serif; }
         #app-container {
             position: relative; width: 100vw; height: 100vh;
-            background-image: url('launch.png.jfif'); /* 翼くんの画像 */
+            background-image: url('launch.png.jfif'); /* aerolaunch.png */
             background-size: cover; background-position: center;
         }
         .glass-panel {
