@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AERO PASS - Home</title>
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; font-family: 'Helvetica Neue', Arial, sans-serif; }
+        #app-container {
+            position: relative; width: 100vw; height: 100vh;
+            background-image: url('home.png.png'); /* aero.home.png */
+            background-size: contain; background-repeat: no-repeat; background-position: center top;
+        }
+        .overlay-val { position: absolute; color: white; font-weight: bold; text-align: center; text-shadow: 0 0 10px #00aaff; }
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 75px;
+            background: #f8f8f8; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #dcdcdc;
+        }
+        .nav-item { text-decoration: none; color: #888; display: flex; flex-direction: column; align-items: center; font-size: 10px; }
+        .nav-item.active { color: #00aaff; }
+    </style>
+</head>
+<body>
+<div id="app-container">
+    <div id="prob-val" class="overlay-val" style="top: 42%; left: 19%; width: 22%; font-size: 24px;">55%</div>
+    <div id="display-time" class="overlay-val" style="top: 64.5%; left: 12.5%; width: 75%; color: #fff; font-size: 16px;">--</div>
+    <div id="display-task" class="overlay-val" style="top: 73.5%; left: 12.5%; width: 75%; color: #fff; font-size: 16px;">--</div>
+    <div id="days-left" class="overlay-val" style="top: 86%; left: 12%; width: 76%; font-size: 18px;">--</div>
+</div>
+<nav class="bottom-nav">
+    <a href="home.html" class="nav-item active"><span>●</span><span>ホーム</span></a>
+    <a href="nittei.html" class="nav-item"><span>●</span><span>スケジュール</span></a>
+    <a href="mock.html" class="nav-item"><span>●</span><span>模擬試験</span></a>
+    <a href="progress.html" class="nav-item"><span>●</span><span>進捗DB</span></a>
+    <a href="mypage.html" class="nav-item"><span>●</span><span>マイページ</span></a>
+</nav>
+<script>
+    window.onload = function() {
+        document.getElementById('display-time').innerText = localStorage.getItem('targetStudyTime') + " 時間";
+        document.getElementById('display-task').innerText = localStorage.getItem('todayKeyTask');
+        const diff = Math.ceil((new Date('2026-07-15') - new Date()) / (1000 * 60 * 60 * 24));
+        document.getElementById('days-left').innerText = `試験まであと ${diff} 日`;
+    }
+</script>
+</body>
+</html>
